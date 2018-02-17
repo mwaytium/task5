@@ -4,35 +4,50 @@
 <html>
 <head>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link rel='stylesheet prefetch'>
+    <link href="https://fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="views/css/stylesheet.css">
 </head>
 <body>
-<p><a href="${pageContext.servletContext.contextPath}/creategroup">Создать группу</a></p>
-<p><a href="${pageContext.servletContext.contextPath}/createuser">Создать юзера</a></p>
+<h1>List of groups</h1>
 <input id="group_name" size="12" placeholder="group" type="text" name="first_name">
 <input id="first_name" size="12" placeholder="first name" type="text" name="first_name">
 <input id="last_name" size="12" placeholder="last name" type="text" name="last_name">
 <input id="search_button" type="button" align="center" value="Поиск"/>
 <input id="export_button" type="button" align="center" value="Экспорт"/>
 <a id="import_button" href="xml"> Импорт</a>
-<div id="data">
-    <dl id="search">
-        <c:forEach var="group" items="${groups}">
-            <dt>${group.id}: ${group.name} :
-                <a href="editgroup?id=${group.id}">Изменить</a>
-                <a href="deletegroup?id=${group.id}">Удалить</a>
-            </dt>
-            <c:forEach var="user" items="${group.users}">
-                <dd>
-                    ${user.id}:
-                    ${user.firstName} :
-                    ${user.lastName} :
-                        <a href="edituser?id=${user.id}">Изменить</a>
-                        <a href="deleteuser?id=${user.id}"> Удалить</a>
-                </dd>
+<nav class="nav">
+    <ul class=list>
+        <li id="data">
+            <a href="${pageContext.servletContext.contextPath}/creategroup">Create group </a>/
+            <a href="${pageContext.servletContext.contextPath}/createuser"> Create user</a>
+            <ul id="search">
+            <c:forEach var="group" items="${groups}">
+                <li>
+                    <a href="#">Group</a>
+                    <span>'${group.name}'</span>
+                    <a href="editgroup?id=${group.id}"><i class="material-icons">edit</i></a>
+                    <a href="deletegroup?id=${group.id}"><i class="material-icons ">delete</i></a>
+                    <ul>
+                    <c:forEach var="user" items="${group.users}">
+                        <li>
+                            <a href="#">User</a>
+                            <span>
+                                    ${user.firstName}
+                                    ${user.lastName}
+                            </span>
+                            <a href="edituser?id=${user.id}"><i class="material-icons">edit</i></a>
+                            <a href="deleteuser?id=${user.id}"><i class="material-icons ">delete</i></a>
+                        </li>
+                    </c:forEach>
+                    </ul>
+                </li>
             </c:forEach>
-        </c:forEach>
-    </dl>
-</div>
+            </ul>
+        </li>
+    </ul>
+
+</nav>
 ------------------------------------------------
 <div id="xml">
     <dl id="export">
@@ -61,18 +76,25 @@
                 success: function (data) {
                     $("#search").remove();
 
-                    var $dl = $("<dl id='search'>").appendTo($("#data"));
-                    var $dt, $dd;
+                    var $main_ul = $("<ul id='search'>").appendTo($("#data"));
+                    var $main_li , $li, $ul, $a;
                     $.each(data, function(index, group) {
-                        $dt = $("<dt>").appendTo($dl).text(group.id + ": " + group.name + " : ");
-                        $("<a>").appendTo($dt).attr("href", "editgroup?id="+group.id).text("Изменить");
-                        $("<a>").appendTo($dt).attr("href", "deletegroup?id="+group.id).text(" Удалить");
+                        $main_li = $("<li>").appendTo($main_ul);
+                        $("<a>").appendTo($main_li).attr("href", "#").text("Group ");
+                        $("<span>").appendTo($main_li).text("'" + group.name + "'");
+                        $a = $("<a>").appendTo($main_li).attr("href", "editgroup?id="+group.id);
+                        $("<i class='material-icons'>").appendTo($a).attr("class", "material-icons").text("edit");
+                        $a = $("<a>").appendTo($main_li).attr("href", "deletegroup?id="+group.id);
+                        $("<i class='material-icons'>").appendTo($a).attr("class", "material-icons").text("delete");
+                        $ul = $("<ul>").appendTo($main_li);
                         $.each(group.users, function(i, user) {
-                            $dd = $("<dd>").appendTo($dt).text(user.id + ": " +
-                                user.firstName + " : " +
-                                user.lastName + " : ");
-                            $("<a>").appendTo($dd).attr("href", "edituser?id="+user.id).text("Изменить");
-                            $("<a>").appendTo($dd).attr("href", "deleteuser?id="+user.id).text(" Удалить");
+                            $li = $("<li>").appendTo($ul);
+                            $("<a>").appendTo($li).attr("href", "#").text("User ");
+                            $("<span>").appendTo($li).text(user.firstName + " " + user.lastName);
+                            $a = $("<a>").appendTo($li).attr("href", "edituser?id="+user.id);
+                            $("<i class='material-icons'>").appendTo($a).attr("class", "material-icons").text("edit");
+                            $a = $("<a>").appendTo($li).attr("href", "deleteuser?id="+user.id);
+                            $("<i class='material-icons'>").appendTo($a).attr("class", "material-icons").text("delete");
                         });
                     });
                 },
@@ -94,7 +116,7 @@
                     var $dl = $("<dl id='export'>").appendTo($("#xml"));
                     var $dt, $dd;
                     $.each(data, function(index, group) {
-                        $dt = $("<dt>").appendTo($dl).text(group.id + ": " + group.name);
+                        $dt = $("<dt>").appendTo($dl).text("Group: " + group.name);
                         $.each(group.users, function(i, user) {
                             $dd = $("<dd>").appendTo($dt).text(user.id + ": " +
                                 user.firstName + " : " +
